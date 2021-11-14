@@ -47,7 +47,7 @@ struct WindowEx
 	static HWND GetHWND(iTJSDispatch2 *obj) {
 		tTJSVariant val;
 		obj->PropGet(0, TJS_W("HWND"), 0, &val, obj);
-		return (HWND)(tjs_int)(val);
+		return (HWND)(tjs_int64)(val);
 	}
 
 	// RECTを辞書に保存
@@ -837,7 +837,7 @@ public:
 			return TRUE;
 		}
 		static LRESULT WINAPI WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
-			OverlayBitmap *self = reinterpret_cast<OverlayBitmap*>(::GetWindowLong(hwnd, GWL_USERDATA));
+			OverlayBitmap *self = reinterpret_cast<OverlayBitmap*>(::GetWindowLongPtr(hwnd, GWLP_USERDATA));
 			if (self != NULL && msg == WM_PAINT) {
 				self->onPaint(hwnd);
 				return 0;
@@ -949,10 +949,10 @@ public:
 				if (!WindowClass) return false;
 			}
 			if (!overlay) {
-				overlay = ::CreateWindowExW(WS_EX_TOPMOST, (LPCWSTR)MAKELONG(WindowClass, 0), TJS_W("WindowExOverlayBitmap"),
+				overlay = ::CreateWindowExW(WS_EX_TOPMOST, (LPCWSTR)(LONG_PTR)WindowClass, TJS_W("WindowExOverlayBitmap"),
 											WS_CHILDWINDOW, 0, 0, 1, 1, TVPGetApplicationWindowHandle(), NULL, hinst, NULL);
 				if (!overlay) return false;
-				::SetWindowLong(overlay, GWL_USERDATA, (LONG)this);
+				::SetWindowLongPtr(overlay, GWLP_USERDATA, (LONG_PTR)this);
 			}
 			return true;
 		}
@@ -1055,7 +1055,7 @@ struct MenuItemEx
 			global->Release();
 		} else mi = obj;
 		mi->PropGet(0, TJS_W("HMENU"), 0, &val, obj);
-		return (HMENU)(tjs_int)(val);
+		return (HMENU)(tjs_intptr_t)(tjs_int64)(val);
 	}
 	// 親メニューを取得
 	static iTJSDispatch2* GetParentMenu(iTJSDispatch2 *obj) {
@@ -1122,20 +1122,20 @@ struct MenuItemEx
 	}
 
 	// property bmpItem
-	tjs_int getBmpItem() const { return getBmpSelect(BMP_ITEM); }
+	tjs_int64 getBmpItem() const { return getBmpSelect(BMP_ITEM); }
 	void setBmpItem(tTJSVariant v) { setBmpSelect(v, BMP_ITEM); }
 
 	// property bmpChecked
-	tjs_int getBmpChecked() const { return getBmpSelect(BMP_CHK); }
+	tjs_int64 getBmpChecked() const { return getBmpSelect(BMP_CHK); }
 	void setBmpChecked(tTJSVariant v) { setBmpSelect(v, BMP_CHK); }
 
 	// property bmpUnchecked
-	tjs_int getBmpUnchecked() const { return getBmpSelect(BMP_UNCHK); }
+	tjs_int64 getBmpUnchecked() const { return getBmpSelect(BMP_UNCHK); }
 	void setBmpUnchecked(tTJSVariant v) { setBmpSelect(v, BMP_UNCHK); }
 
-	tjs_int getBmpSelect(int sel) const {
+	tjs_int64 getBmpSelect(int sel) const {
 		switch (bmptype[sel]) {
-		case BMT_SYS: return (tjs_int)bitmap[sel];
+		case BMT_SYS: return (tjs_int64)(tjs_intptr_t)(bitmap[sel]);
 		case BMT_BMP: return -1;
 		default:      return 0;
 		}
@@ -1235,7 +1235,7 @@ private:
 	HBITMAP bitmap[BMP_MAX];
 
 public:
-	static bool InsertMenuItem(HMENU menu, iTJSDispatch2 *obj, WORD &curid, WORD idmv, iTJSDispatch2 *items, DWORD sysdt) {
+	static bool InsertMenuItem(HMENU menu, iTJSDispatch2 *obj, WORD &curid, WORD idmv, iTJSDispatch2 *items, ULONG_PTR sysdt) {
 		if (obj == NULL) return false;
 		// 非表示ならないもしない
 		tTJSVariant val;
@@ -1335,7 +1335,7 @@ public:
 		}
 		return !!::InsertMenuItem(menu, pos, insPos, &mi);
 	}
-	static HMENU CreateMenuList(HMENU menu, iTJSDispatch2 *obj, WORD &curid, WORD idmv, iTJSDispatch2 *items, DWORD sysdt) {
+	static HMENU CreateMenuList(HMENU menu, iTJSDispatch2 *obj, WORD &curid, WORD idmv, iTJSDispatch2 *items, ULONG_PTR sysdt) {
 		HMENU       ret = NULL;
 		tjs_int     count = 0;
 		tTJSVariant val;
@@ -1354,7 +1354,7 @@ public:
 		if (!created && menu == NULL) ::DestroyMenu(ret);
 		return created ? ret : NULL;
 	}
-	static void RemoveMenuList(HMENU menu, DWORD sysdt) {
+	static void RemoveMenuList(HMENU menu, ULONG_PTR sysdt) {
 		UINT cnt = ::GetMenuItemCount(menu);
 		MENUITEMINFO mi;
 		ZeroMemory(&mi, sizeof(mi));
@@ -1419,16 +1419,16 @@ NCB_GET_INSTANCE_HOOK(MenuItemEx)
 };
 NCB_ATTACH_CLASS_WITH_HOOK(MenuItemEx, MenuItem)
 {
-	Variant(TJS_W("biSystem"),           (tjs_int)HBMMENU_SYSTEM);
-	Variant(TJS_W("biRestore"),          (tjs_int)HBMMENU_MBAR_RESTORE);
-	Variant(TJS_W("biMinimize"),         (tjs_int)HBMMENU_MBAR_MINIMIZE);
-	Variant(TJS_W("biClose"),            (tjs_int)HBMMENU_MBAR_CLOSE);
-	Variant(TJS_W("biCloseDisabled"),    (tjs_int)HBMMENU_MBAR_CLOSE_D);
-	Variant(TJS_W("biMinimizeDisabled"), (tjs_int)HBMMENU_MBAR_MINIMIZE_D);
-	Variant(TJS_W("biPopupClose"),       (tjs_int)HBMMENU_POPUP_CLOSE);
-	Variant(TJS_W("biPopupRestore"),     (tjs_int)HBMMENU_POPUP_RESTORE);
-	Variant(TJS_W("biPopupMaximize"),    (tjs_int)HBMMENU_POPUP_MAXIMIZE);
-	Variant(TJS_W("biPopupMinimize"),    (tjs_int)HBMMENU_POPUP_MINIMIZE);
+	Variant(TJS_W("biSystem"),           (tjs_int64)HBMMENU_SYSTEM);
+	Variant(TJS_W("biRestore"),          (tjs_int64)HBMMENU_MBAR_RESTORE);
+	Variant(TJS_W("biMinimize"),         (tjs_int64)HBMMENU_MBAR_MINIMIZE);
+	Variant(TJS_W("biClose"),            (tjs_int64)HBMMENU_MBAR_CLOSE);
+	Variant(TJS_W("biCloseDisabled"),    (tjs_int64)HBMMENU_MBAR_CLOSE_D);
+	Variant(TJS_W("biMinimizeDisabled"), (tjs_int64)HBMMENU_MBAR_MINIMIZE_D);
+	Variant(TJS_W("biPopupClose"),       (tjs_int64)HBMMENU_POPUP_CLOSE);
+	Variant(TJS_W("biPopupRestore"),     (tjs_int64)HBMMENU_POPUP_RESTORE);
+	Variant(TJS_W("biPopupMaximize"),    (tjs_int64)HBMMENU_POPUP_MAXIMIZE);
+	Variant(TJS_W("biPopupMinimize"),    (tjs_int64)HBMMENU_POPUP_MINIMIZE);
 
 	Property(TJS_W("rightJustify"), &Class::getRightJustify, &Class::setRightJustify);
 	Property(TJS_W("bmpItem"),      &Class::getBmpItem,      &Class::setBmpItem     );
@@ -1463,7 +1463,7 @@ void WindowEx::setMenuItemID(iTJSDispatch2* obj, UINT id, bool set) {
 
 void WindowEx::resetSystemMenu() {
 	if (sysMenu != NULL && sysMenuModified != NULL) {
-		MenuItemEx::RemoveMenuList(sysMenu, (DWORD)sysMenuModified);
+		MenuItemEx::RemoveMenuList(sysMenu, (ULONG_PTR)sysMenuModified);
 	}
 	if (sysMenuModMap != NULL) sysMenuModMap->Release();
 	sysMenuModMap = NULL;
@@ -1474,7 +1474,7 @@ void WindowEx::modifySystemMenu() {
 	sysMenuModMap = TJSCreateDictionaryObject();
 	WORD id = 0xF000-1;
 	if (sysMenu == NULL) sysMenu = ::GetSystemMenu(cachedHWND, FALSE);
-	sysMenu = MenuItemEx::CreateMenuList(sysMenu, sysMenuModified, id, -1, sysMenuModMap, (DWORD)sysMenuModified);
+	sysMenu = MenuItemEx::CreateMenuList(sysMenu, sysMenuModified, id, -1, sysMenuModMap, (ULONG_PTR)sysMenuModified);
 	if (sysMenu == NULL) {
 		::GetSystemMenu(cachedHWND, TRUE);
 		sysMenuModMap->Release();
@@ -1694,31 +1694,31 @@ struct PadEx
 		if (hwnd != NULL && (!en || !same)) {
 			if (OrigWndProc != NULL && hwnd != NULL && ::IsWindow(hwnd)) {
 				// WndProc戻し
-				WNDPROC proc =     (WNDPROC)::GetWindowLong(hwnd, GWL_WNDPROC);
-				if (proc == HookWindowProc) ::SetWindowLong(hwnd, GWL_WNDPROC, (LONG)OrigWndProc);
+				WNDPROC proc =     (WNDPROC)::GetWindowLongPtr(hwnd, GWLP_WNDPROC);
+				if (proc == HookWindowProc) ::SetWindowLongPtr(hwnd, GWLP_WNDPROC, (LONG_PTR)OrigWndProc);
 				// UserData戻し
-				LONG ud =              ::GetWindowLong(hwnd, GWL_USERDATA);
-				if ( ud == (LONG)this) ::SetWindowLong(hwnd, GWL_USERDATA, 0);
+				LONG_PTR ud =              ::GetWindowLongPtr(hwnd, GWLP_USERDATA);
+				if ( ud == (LONG_PTR)this) ::SetWindowLongPtr(hwnd, GWLP_USERDATA, 0);
 			}
 		}
 		hwnd = now;
 		if (!en) return;
 		if (hwnd == NULL) TVPThrowExceptionMessage(TJS_W("Cannot get Pad window handle."));
 
-		LONG ud = ::GetWindowLong(hwnd, GWL_USERDATA);
-		if (!ud)  ::SetWindowLong(hwnd, GWL_USERDATA, (LONG)this);
-		else if (ud != (LONG)this) TVPThrowExceptionMessage(TJS_W("Cannot set Pad user data."));
+		LONG_PTR ud = ::GetWindowLongPtr(hwnd, GWLP_USERDATA);
+		if (!ud)  ::SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)this);
+		else if (ud != (LONG_PTR)this) TVPThrowExceptionMessage(TJS_W("Cannot set Pad user data."));
 
-		WNDPROC proc = (WNDPROC)::GetWindowLong(hwnd, GWL_WNDPROC);
+		WNDPROC proc = (WNDPROC)::GetWindowLongPtr(hwnd, GWLP_WNDPROC);
 		if (proc != HookWindowProc) {
 			if (OrigWndProc == NULL) OrigWndProc = proc;
 			else if (proc != OrigWndProc) TVPThrowExceptionMessage(TJS_W("Cannot set Pad proc."));
-			::SetWindowLong(hwnd, GWL_WNDPROC, (LONG)HookWindowProc);
+			::SetWindowLongPtr(hwnd, GWLP_WNDPROC, (LONG_PTR)HookWindowProc);
 		}
 	}
 	static LRESULT CALLBACK HookWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		if (uMsg == WM_SYSCOMMAND) {
-			PadEx *self = (PadEx*)::GetWindowLong(hwnd, GWL_USERDATA);
+			PadEx *self = (PadEx*)::GetWindowLongPtr(hwnd, GWLP_USERDATA);
 			if (self != NULL) {
 				switch (wParam & 0xFFF0) {
 				case SC_CLOSE: self->onClose(); break;
