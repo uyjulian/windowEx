@@ -910,7 +910,7 @@ public:
 			if (!initOverlay()) return false;
 			HWND base = GetHWND(win);
 			HWND hwnd = NULL;
-			::EnumChildWindows(base, SearchScrollBox, (LPARAM)&hwnd);
+			::EnumChildWindows(base, (WNDENUMPROC)SearchScrollBox, (LPARAM)&hwnd);
 			if (!hwnd) hwnd = base; // return false; // for krkrZ
 
 			removeBitmap();
@@ -1503,7 +1503,7 @@ struct ConsoleEx
 	}
 	static HWND GetHWND() {
 		SearchWork wk = { TJS_W("TTVPConsoleForm"), NULL };
-		::EnumThreadWindows(GetCurrentThreadId(), SearchWindowClass, (LPARAM)&wk);
+		::EnumThreadWindows(GetCurrentThreadId(), (WNDENUMPROC)SearchWindowClass, (LPARAM)&wk);
 		return wk.result;
 	}
 
@@ -1654,7 +1654,7 @@ struct PadEx
 		obj->PropSet(0, TJS_W("title"), 0, &_uuid, obj);
 
 		SearchWork wk = { TJS_W("TTVPPadForm"), _uuid, NULL };
-		::EnumThreadWindows(GetCurrentThreadId(), SearchWindowClassAndTitle, (LPARAM)&wk);
+		::EnumThreadWindows(GetCurrentThreadId(), (WNDENUMPROC)SearchWindowClassAndTitle, (LPARAM)&wk);
 		obj->PropSet(0, TJS_W("title"), 0, &val, obj);
 		return wk.result;
 	}
@@ -1725,7 +1725,7 @@ struct PadEx
 				}
 			}
 		}
-		return (OrigWndProc ? CallWindowProc(OrigWndProc, hwnd, uMsg, wParam, lParam)
+		return (OrigWndProc ? CallWindowProc((FARPROC)OrigWndProc, hwnd, uMsg, wParam, lParam)
 				:         ::DefWindowProc(hwnd, uMsg, wParam, lParam));
 	}
 
