@@ -1130,8 +1130,8 @@ struct MenuItemEx
 	void setBmpChecked(tTJSVariant v) { setBmpSelect(v, BMP_CHK); }
 
 	// property bmpUnchecked
-	tjs_int getBmpUnchecked() const { return getBmpSelect(BMP_UNCHK); }
 	tjs_int64 getBmpUnchecked() const { return getBmpSelect(BMP_UNCHK); }
+	void setBmpUnchecked(tTJSVariant v) { setBmpSelect(v, BMP_UNCHK); }
 
 	tjs_int64 getBmpSelect(int sel) const {
 		switch (bmptype[sel]) {
