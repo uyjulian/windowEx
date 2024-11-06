@@ -866,7 +866,7 @@ public:
 			w = obj.getIntValue(TJS_W("imageWidth"));
 			h = obj.getIntValue(TJS_W("imageHeight"));
 			tjs_int ln = obj.getIntValue(TJS_W("mainImageBufferPitch"));
-			PIX *pw, *pr = reinterpret_cast<unsigned char *>(obj.getIntValue(TJS_W("mainImageBuffer")));
+			PIX *pw, *pr = reinterpret_cast<unsigned char *>(obj.getIntPtrValue(TJS_W("mainImageBuffer")));
 
 			BITMAPINFO info;
 			ZeroMemory(&info, sizeof(info));
@@ -1705,9 +1705,9 @@ struct PadEx
 		if (!en) return;
 		if (hwnd == NULL) TVPThrowExceptionMessage(TJS_W("Cannot get Pad window handle."));
 
-		LONG_PTR ud = ::GetWindowLongPtr(hwnd, GWLP_USERDATA);
+		auto ud = ::GetWindowLongPtr(hwnd, GWLP_USERDATA);
 		if (!ud)  ::SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)this);
-		else if (ud != (LONG_PTR)this) TVPThrowExceptionMessage(TJS_W("Cannot set Pad user data."));
+		else if (ud != (LONG)this) TVPThrowExceptionMessage(TJS_W("Cannot set Pad user data."));
 
 		WNDPROC proc = (WNDPROC)::GetWindowLongPtr(hwnd, GWLP_WNDPROC);
 		if (proc != HookWindowProc) {
@@ -1718,7 +1718,11 @@ struct PadEx
 	}
 	static LRESULT CALLBACK HookWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		if (uMsg == WM_SYSCOMMAND) {
+#if 1
 			PadEx *self = (PadEx*)::GetWindowLongPtr(hwnd, GWLP_USERDATA);
+#else
+			PadEx *self = (PadEx*)::GetWindowLong(hwnd, GWLP_USERDATA);
+#endif
 			if (self != NULL) {
 				switch (wParam & 0xFFF0) {
 				case SC_CLOSE: self->onClose(); break;
