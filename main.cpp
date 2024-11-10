@@ -1712,7 +1712,7 @@ struct PadEx
 #else
 		auto ud = ::GetWindowLongPtr(hwnd, GWLP_USERDATA);
 		if (!ud)  ::SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)this);
-		else if (ud != (LONG)this) TVPThrowExceptionMessage(TJS_W("Cannot set Pad user data."));
+		else if (ud != (ULONG_PTR)this) TVPThrowExceptionMessage(TJS_W("Cannot set Pad user data."));
 #endif
 
 		WNDPROC proc = (WNDPROC)::GetWindowLongPtr(hwnd, GWLP_WNDPROC);
@@ -1727,7 +1727,7 @@ struct PadEx
 #if 1
 			PadEx *self = (PadEx*)::GetWindowLongPtr(hwnd, GWLP_USERDATA);
 #else
-			PadEx *self = (PadEx*)::GetWindowLong(hwnd, GWLP_USERDATA);
+			PadEx *self = (PadEx*)::GetWindowLongPtr(hwnd, GWLP_USERDATA);
 #endif
 			if (self != NULL) {
 				switch (wParam & 0xFFF0) {
