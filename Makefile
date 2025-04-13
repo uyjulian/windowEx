@@ -1,7 +1,7 @@
 
 SOURCES += main.cpp
 
-LDLIBS += -lgdi32
+LDLIBS += -lgdi32 -limm32
 
 CFLAGS += -DWINVER=0x0601 -D_WIN32_WINNT=0x0601
 
