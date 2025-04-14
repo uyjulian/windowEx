@@ -1997,7 +1997,7 @@ struct PadEx
 				}
 			}
 		}
-		return (OrigWndProc ? CallWindowProc((FARPROC)OrigWndProc, hwnd, uMsg, wParam, lParam)
+		return (OrigWndProc ? CallWindowProc((WNDPROC)OrigWndProc, hwnd, uMsg, wParam, lParam)
 				:         ::DefWindowProc(hwnd, uMsg, wParam, lParam));
 	}
 
