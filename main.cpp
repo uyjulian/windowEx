@@ -1986,11 +1986,7 @@ struct PadEx
 	}
 	static LRESULT CALLBACK HookWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		if (uMsg == WM_SYSCOMMAND) {
-#if 1
 			PadEx *self = (PadEx*)::GetWindowLongPtr(hwnd, GWLP_USERDATA);
-#else
-			PadEx *self = (PadEx*)::GetWindowLongPtr(hwnd, GWLP_USERDATA);
-#endif
 			if (self != NULL) {
 				switch (wParam & 0xFFF0) {
 				case SC_CLOSE: self->onClose(); break;
