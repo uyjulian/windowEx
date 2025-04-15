@@ -1317,7 +1317,7 @@ struct MenuItemEx
 			global->Release();
 		} else mi = obj;
 		mi->PropGet(0, TJS_W("HMENU"), 0, &val, obj);
-		return (HMENU)(tjs_intptr_t)(tjs_int64)(val);
+		return (HMENU)(tjs_intptr_t)(tTVInteger)(val);
 	}
 	// 親メニューを取得
 	static iTJSDispatch2* GetParentMenu(iTJSDispatch2 *obj) {
@@ -1384,20 +1384,20 @@ struct MenuItemEx
 	}
 
 	// property bmpItem
-	tjs_int64 getBmpItem() const { return getBmpSelect(BMP_ITEM); }
+	tTVInteger getBmpItem() const { return getBmpSelect(BMP_ITEM); }
 	void setBmpItem(tTJSVariant v) { setBmpSelect(v, BMP_ITEM); }
 
 	// property bmpChecked
-	tjs_int64 getBmpChecked() const { return getBmpSelect(BMP_CHK); }
+	tTVInteger getBmpChecked() const { return getBmpSelect(BMP_CHK); }
 	void setBmpChecked(tTJSVariant v) { setBmpSelect(v, BMP_CHK); }
 
 	// property bmpUnchecked
-	tjs_int64 getBmpUnchecked() const { return getBmpSelect(BMP_UNCHK); }
+	tTVInteger getBmpUnchecked() const { return getBmpSelect(BMP_UNCHK); }
 	void setBmpUnchecked(tTJSVariant v) { setBmpSelect(v, BMP_UNCHK); }
 
-	tjs_int64 getBmpSelect(int sel) const {
+	tTVInteger getBmpSelect(int sel) const {
 		switch (bmptype[sel]) {
-		case BMT_SYS: return (tjs_int64)(tjs_intptr_t)(bitmap[sel]);
+		case BMT_SYS: return (tTVInteger)(tjs_intptr_t)(bitmap[sel]);
 		case BMT_BMP: return -1;
 		default:      return 0;
 		}
@@ -1409,7 +1409,7 @@ struct MenuItemEx
 		case tvtInteger:
 		case tvtString:
 			bmptype[sel] = BMT_SYS;
-			bitmap[sel] = (HBITMAP)v.AsInteger();
+			bitmap[sel] = (HBITMAP)(tjs_intptr_t)v.AsInteger();
 			break;
 		case tvtObject:
 			iTJSDispatch2 *lay = v.AsObjectNoAddRef();
