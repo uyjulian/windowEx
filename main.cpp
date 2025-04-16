@@ -1967,9 +1967,9 @@ struct PadEx
 		if (!en) return;
 		if (hwnd == NULL) TVPThrowExceptionMessage(TJS_W("Cannot get Pad window handle."));
 
-		auto ud = ::GetWindowLongPtr(hwnd, GWLP_USERDATA);
+		LONG_PTR ud = ::GetWindowLongPtr(hwnd, GWLP_USERDATA);
 		if (!ud)  ::SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)this);
-		else if (ud != (ULONG_PTR)this) TVPThrowExceptionMessage(TJS_W("Cannot set Pad user data."));
+		else if (ud != (LONG_PTR)this) TVPThrowExceptionMessage(TJS_W("Cannot set Pad user data."));
 
 		WNDPROC proc = (WNDPROC)::GetWindowLongPtr(hwnd, GWLP_WNDPROC);
 		if (proc != HookWindowProc) {
