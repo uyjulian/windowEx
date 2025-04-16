@@ -1497,7 +1497,7 @@ private:
 	HBITMAP bitmap[BMP_MAX];
 
 public:
-	static bool InsertMenuItem(HMENU menu, iTJSDispatch2 *obj, WORD &curid, WORD idmv, iTJSDispatch2 *items, DWORD sysdt) {
+	static bool InsertMenuItem(HMENU menu, iTJSDispatch2 *obj, WORD &curid, WORD idmv, iTJSDispatch2 *items, ULONG_PTR sysdt) {
 		if (obj == NULL) return false;
 		// 非表示ならないもしない
 		tTJSVariant val;
