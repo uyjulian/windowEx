@@ -1205,7 +1205,7 @@ public:
 				if (!WindowClass) return false;
 			}
 			if (!overlay) {
-				overlay = ::CreateWindowExW(WS_EX_TOPMOST, (LPCWSTR)WindowClass, TJS_W("WindowExOverlayBitmap"),
+				overlay = ::CreateWindowExW(WS_EX_TOPMOST, (LPCWSTR)(LONG_PTR)WindowClass, TJS_W("WindowExOverlayBitmap"),
 											WS_CHILDWINDOW, 0, 0, 1, 1, TVPGetApplicationWindowHandle(), NULL, hinst, NULL);
 				if (!overlay) return false;
 				::SetWindowLongPtr(overlay, GWLP_USERDATA, (LONG_PTR)this);
@@ -1409,7 +1409,7 @@ struct MenuItemEx
 		case tvtInteger:
 		case tvtString:
 			bmptype[sel] = BMT_SYS;
-			bitmap[sel] = (HBITMAP)v.AsInteger();
+			bitmap[sel] = (HBITMAP)(tjs_intptr_t)v.AsInteger();
 			break;
 		case tvtObject:
 			iTJSDispatch2 *lay = v.AsObjectNoAddRef();
