@@ -1205,7 +1205,7 @@ public:
 				if (!WindowClass) return false;
 			}
 			if (!overlay) {
-				overlay = ::CreateWindowExW(WS_EX_TOPMOST, (LPCWSTR)WindowClass, TJS_W("WindowExOverlayBitmap"),
+				overlay = ::CreateWindowExW(WS_EX_TOPMOST, (LPCWSTR)(LONG_PTR)WindowClass, TJS_W("WindowExOverlayBitmap"),
 											WS_CHILDWINDOW, 0, 0, 1, 1, TVPGetApplicationWindowHandle(), NULL, hinst, NULL);
 				if (!overlay) return false;
 				::SetWindowLongPtr(overlay, GWLP_USERDATA, (LONG_PTR)this);
@@ -1317,7 +1317,7 @@ struct MenuItemEx
 			global->Release();
 		} else mi = obj;
 		mi->PropGet(0, TJS_W("HMENU"), 0, &val, obj);
-		return (HMENU)(tjs_int64)(val);
+		return (HMENU)(tjs_intptr_t)(tTVInteger)(val);
 	}
 	// 親メニューを取得
 	static iTJSDispatch2* GetParentMenu(iTJSDispatch2 *obj) {
@@ -1384,20 +1384,20 @@ struct MenuItemEx
 	}
 
 	// property bmpItem
-	tjs_int getBmpItem() const { return getBmpSelect(BMP_ITEM); }
+	tTVInteger getBmpItem() const { return getBmpSelect(BMP_ITEM); }
 	void setBmpItem(tTJSVariant v) { setBmpSelect(v, BMP_ITEM); }
 
 	// property bmpChecked
-	tjs_int getBmpChecked() const { return getBmpSelect(BMP_CHK); }
+	tTVInteger getBmpChecked() const { return getBmpSelect(BMP_CHK); }
 	void setBmpChecked(tTJSVariant v) { setBmpSelect(v, BMP_CHK); }
 
 	// property bmpUnchecked
-	tjs_int getBmpUnchecked() const { return getBmpSelect(BMP_UNCHK); }
+	tTVInteger getBmpUnchecked() const { return getBmpSelect(BMP_UNCHK); }
 	void setBmpUnchecked(tTJSVariant v) { setBmpSelect(v, BMP_UNCHK); }
 
-	tjs_int64 getBmpSelect(int sel) const {
+	tTVInteger getBmpSelect(int sel) const {
 		switch (bmptype[sel]) {
-		case BMT_SYS: return (tjs_int64)bitmap[sel];
+		case BMT_SYS: return (tTVInteger)(tjs_intptr_t)(bitmap[sel]);
 		case BMT_BMP: return -1;
 		default:      return 0;
 		}
@@ -1409,7 +1409,7 @@ struct MenuItemEx
 		case tvtInteger:
 		case tvtString:
 			bmptype[sel] = BMT_SYS;
-			bitmap[sel] = (HBITMAP)v.AsInteger();
+			bitmap[sel] = (HBITMAP)(tjs_intptr_t)v.AsInteger();
 			break;
 		case tvtObject:
 			iTJSDispatch2 *lay = v.AsObjectNoAddRef();
@@ -1497,7 +1497,7 @@ private:
 	HBITMAP bitmap[BMP_MAX];
 
 public:
-	static bool InsertMenuItem(HMENU menu, iTJSDispatch2 *obj, WORD &curid, WORD idmv, iTJSDispatch2 *items, DWORD sysdt) {
+	static bool InsertMenuItem(HMENU menu, iTJSDispatch2 *obj, WORD &curid, WORD idmv, iTJSDispatch2 *items, ULONG_PTR sysdt) {
 		if (obj == NULL) return false;
 		// 非表示ならないもしない
 		tTJSVariant val;
@@ -1967,9 +1967,9 @@ struct PadEx
 		if (!en) return;
 		if (hwnd == NULL) TVPThrowExceptionMessage(TJS_W("Cannot get Pad window handle."));
 
-		auto ud = ::GetWindowLongPtr(hwnd, GWLP_USERDATA);
+		LONG_PTR ud = ::GetWindowLongPtr(hwnd, GWLP_USERDATA);
 		if (!ud)  ::SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)this);
-		else if (ud != (ULONG_PTR)this) TVPThrowExceptionMessage(TJS_W("Cannot set Pad user data."));
+		else if (ud != (LONG_PTR)this) TVPThrowExceptionMessage(TJS_W("Cannot set Pad user data."));
 
 		WNDPROC proc = (WNDPROC)::GetWindowLongPtr(hwnd, GWLP_WNDPROC);
 		if (proc != HookWindowProc) {
